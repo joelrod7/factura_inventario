@@ -1,3 +1,7 @@
+<?php
+    include("../php/Conexion.php");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +11,7 @@
     <link rel="stylesheet" href="../css/bootstrap-4.6.0/dist/css/bootstrap.css">
     <title>Facturacion</title>
 </head>
-<body>
+<body onload="fecha()">
     <div class="container">
         <form action="" method="post">
             FACTURACION
@@ -18,7 +22,8 @@
                 </div>
                 <div>
                     <label for="">Nombre:</label>
-                    <input type="text" name="nom_cliente" id="nom_cliente" class="form-control">
+                    <input type="text" name="nom_cliente" id="nom_cliente" class="form-control" onkeyup="buscaCliente()">
+                    <div id="sugerencias" class ="list-group"></div>
                 </div>
             </div>
 
@@ -78,4 +83,63 @@
         </form>
     </div>
 </body>
+
+<script>
+
+    function buscaCliente() {
+        
+        var criterio = document.getElementById("nom_cliente").value;
+        var lista;
+        if (criterio.length > 3) {
+            
+            // Ajax
+            if (window.XMLHttpRequest) {
+                xhr = new XMLHttpRequest();
+            }
+            else if(window.ActiveXObject){
+                xhr = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xhr.onreadystatechange = confirmar;
+            xhr.open('POST','../php/retornaDatos.php', false);
+            xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            // xhr.send("nombre= "+document.getElementById("nom_cliente").value);
+            xhr.send("nombre= "+criterio);
+
+            function confirmar() {
+
+                if (xhr.readyState == 4) {
+                    if (xhr.status = 200) {
+                        respuesta = this.responseText;
+                        if (respuesta = 0) {
+                            alert("No existe");
+                        }else{
+                            lista = document.getElementById("sugerencias");
+                            lista.innerHTML = respuesta;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function fecha() {
+
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd '0'+ dd;
+        }
+        if (mm < 10) {
+            mm = "0" + mm;
+        }
+        today = dd + '/' + mm + '/' + yyyy;
+        document.getElementById("fecha").value = today;
+    }
+
+
+</script>
 </html>
